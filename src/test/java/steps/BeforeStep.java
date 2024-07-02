@@ -1,20 +1,12 @@
 package steps;
 
-import io.cucumber.java.en.Given;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
+import com.codeborne.selenide.Selenide;
+import io.cucumber.java.ru.Когда;
 
 public class BeforeStep {
-    public static WebDriver driver;
-    public static WebDriverWait wait;
 
-    @Given("Открываем сайт {string}")
+    @Когда("^открыт сайт '([^']*)'$")
     public void openWebSite(String url) {
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.get(url);
-        driver.manage().timeouts().implicitlyWait(java.time.Duration.ofSeconds(10));
+        Selenide.open(url);
     }
 }

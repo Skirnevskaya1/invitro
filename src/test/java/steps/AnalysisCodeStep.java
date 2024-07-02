@@ -1,35 +1,27 @@
 package steps;
 
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import com.codeborne.selenide.SelenideElement;
+import io.cucumber.java.ru.Когда;
+import io.cucumber.java.ru.Тогда;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static steps.BeforeStep.driver;
+import static com.codeborne.selenide.Selenide.$x;
+
 
 public class AnalysisCodeStep {
-    WebElement searchField = driver.findElement(By.xpath(
-            "//div[@class='invitro_header-search']/descendant::input[@name='q']"));
-    WebElement nameResultCode = driver.findElement(By.xpath(
-            "//div[@class='analyzes-item__head--number']/child::span"));
-    WebDriverWait wait = new WebDriverWait(driver, java.time.Duration.ofSeconds(10));
+    public final SelenideElement
+            searchInputField = $x("//input[@name='q']").as("Поиск на сайте "),
+            codeResult = $x("//div[contains(@class,'head--number')]/span")
+                    .as("Результат поиска код анализа");
 
-
-    @When("Вводим код анализа в поле поиска")
-    public void enterAnalysisCode(String code) throws InterruptedException {
-        wait.until(ExpectedConditions.elementToBeClickable(searchField));
-        searchField.click();
-        searchField.sendKeys(code + Keys.ENTER);
+    @Когда("^вводим код анализа '([^']*)' в поле поиска$")
+    public void enterCode(String code) {
+        searchInputField.setValue(code).pressEnter();
     }
 
-    @Then("Проверка кода с найденным результатом")
+    @Тогда("^проверяем код анализа '([^']*)' с найденным результатом$")
     public void checkResult(String code) {
-        Assertions.assertEquals(code, nameResultCode.getText()
+        Assertions.assertEquals("№ " + code, codeResult.getText()
                 , "Код анализа не совпадает с результатом в разделе");
     }
-
 }

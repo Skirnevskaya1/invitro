@@ -1,48 +1,47 @@
 package steps;
 
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+import io.cucumber.java.ru.Когда;
+import io.cucumber.java.ru.Тогда;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static steps.BeforeStep.driver;
+import static com.codeborne.selenide.Selenide.$x;
 
 public class CityStep {
-    WebElement cityElement = driver.findElement(By.xpath(
-            "//div[@id='headerCityNameDynamic']/child::span"));
-    WebElement fieldSearch = driver.findElement(By.id("select-basket-city-input"));
-    WebElement btnCity = driver.findElement(By.xpath(
-            "//a[contains(@class,'btn--empty city')]/child::span"));
 
-    WebDriverWait wait = new WebDriverWait(driver, java.time.Duration.ofSeconds(10));
+    public final SelenideElement
+            cityBtn = $x("//*[@id='headerCityNameDynamic']/span")
+            .as("Кнопка с названием города"),
+            cityChangeBtn = $x("//a[contains(@class,'btn--empty city')]/span")
+                    .as("Кнопка выбрать другой город"),
+            cityInputField = $x("//*[@id='select-basket-city-input']").as("Поле ввода");
 
 
-    @When("Нажимаем на город")
+    @Когда("^нажимаем на кнопку город$")
     public void clickOnCity() {
-        cityElement.click();
-
+        cityBtn.click();
     }
 
-    @And("Нажимаем кнопку выбрать другой")
-    public void clickButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(btnCity));
-        btnCity.click();
+    @Когда("^нажимаем на кнопку выбрать другой$")
+    public void clickOnChangeCity() {
+        cityChangeBtn.shouldBe(Condition.visible).click();
     }
 
-    @And("Вводим в поиск {string}")
-    public void enterInField(String value) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("select-basket-city-input")));
-        fieldSearch.sendKeys(value);
-        driver.findElement(By.xpath("//b[text()='" + value + "']")).click();
+    @Когда("^в поле поиска вводим значение '([^']*)'$")
+    public void inputCity(String value) {
+        cityInputField.shouldBe(Condition.visible).click();
+        cityInputField.setValue(value);
     }
 
-    @Then("Проверка результата поиска: отобразился {string}")
+    @Когда("^нажимаем на результат поиска '([^']*)'$")
+    public void clickResult(String value) {
+        $x("//b[text()='" + value + "']").shouldBe(Condition.visible).click();
+    }
+
+    @Тогда("^проверяем отображение города '([^']*)' в разделе медицинские услуги")
     public void checkResult(String value) {
-        Assertions.assertEquals(value, cityElement.getText()
+        Assertions.assertEquals(value, cityBtn.getText()
                 , "Город не отображается в разделе");
     }
 }
